@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Configure - Timetable System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>⚙️ Academic Configuration</h1>
+    <p>Set up academic year, term, semester, and scheduling parameters</p>
+</div>
+
+<div class="config-container">
+    <form action="{{ url_for('save_configuration') }}" method="POST" class="config-form">
+        
+        <!-- Academic Year -->
+        <div class="form-group">
+            <label for="academic_year">Academic Year</label>
+            <input type="text" id="academic_year" name="academic_year" 
+                   placeholder="2024-2025" pattern="\d{4}-\d{4}" 
+                   value="{% if config %}{{ config.academic_year }}{% endif %}" required>
+            <small>Format: YYYY-YYYY (e.g., 2024-2025)</small>
+        </div>
+
+        <!-- Term -->
+        <div class="form-group">
+            <label for="term">Term</label>
+            <select id="term" name="term" required>
+                <option value="">Select Term</option>
+                <option value="Jan-June" {% if config and config.term == 'Jan-June' %}selected{% endif %}>Jan-June (Even Semesters: 2,4,6,8)</option>
+                <option value="July-Dec" {% if config and config.term == 'July-Dec' %}selected{% endif %}>July-Dec (Odd Semesters: 1,3,5,7)</option>
+            </select>
+        </div>
+
+        <!-- Semester -->
+        <div class="form-group">
+            <label for="semester">Semester</label>
+            <select id="semester" name="semester" required>
+                <option value="">Select Semester</option>
+                <option value="1" {% if config and config.semester == 1 %}selected{% endif %}>Semester 1</option>
+                <option value="2" {% if config and config.semester == 2 %}selected{% endif %}>Semester 2</option>
+                <option value="3" {% if config and config.semester == 3 %}selected{% endif %}>Semester 3</option>
+                <option value="4" {% if config and config.semester == 4 %}selected{% endif %}>Semester 4</option>
+                <option value="5" {% if config and config.semester == 5 %}selected{% endif %}>Semester 5</option>
+                <option value="6" {% if config and config.semester == 6 %}selected{% endif %}>Semester 6</option>
+                <option value="7" {% if config and config.semester == 7 %}selected{% endif %}>Semester 7</option>
+                <option value="8" {% if config and config.semester == 8 %}selected{% endif %}>Semester 8</option>
+            </select>
+        </div>
+
+        <!-- Working Days -->
+        <div class="form-group">
+            <label for="working_days">Working Days</label>
+            <select id="working_days" name="working_days" required>
+                <option value="Mon-Fri" {% if config and config.working_days == 'Mon-Fri' %}selected{% endif %}>Monday to Friday (5 days)</option>
+                <option value="Mon-Sat" {% if config and config.working_days == 'Mon-Sat' %}selected{% endif %}>Monday to Saturday (6 days)</option>
+            </select>
+        </div>
+
+        <!-- Shift Mode -->
+        <div class="form-group">
+            <label for="shift_mode">Shift Mode</label>
+            <select id="shift_mode" name="shift_mode" required onchange="toggleShiftInputs()">
+                <option value="single" {% if config and config.shift_mode == 'single' %}selected{% endif %}>Single Shift</option>
+                <option value="multi" {% if config and config.shift_mode == 'multi' %}selected{% endif %}>Multi Shift</option>
+            </select>
+        </div>
+
+        <!-- Single Shift Timings -->
+        <div id="single-shift-inputs" class="shift-inputs">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="single_start">Start Time</label>
+                    <input type="time" id="single_start" name="single_start" value="09:00">
+                </div>
+                <div class="form-group">
+                    <label for="single_end">End Time</label>
+                    <input type="time" id="single_end" name="single_end" value="17:00">
+                </div>
+            </div>
+        </div>
+
+        <!-- Multi Shift Info -->
+        <div id="multi-shift-info" class="shift-inputs" style="display: none;">
+            <div class="info-box">
+                <p><strong>Multi-shift preset timings:</strong></p>
+                <p>Morning Shift: 08:00 - 13:00</p>
+                <p>Afternoon Shift: 14:00 - 18:00</p>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg">💾 Save Configuration</button>
+    </form>
+</div>
+
+<div class="stats-overview">
+    <h2>📊 Current Data</h2>
+    <div class="stats-grid">
+        <div class="stat-item">
+            <span class="stat-label">Faculty:</span>
+            <span class="stat-value">{{ stats.faculty_count }}</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Subjects:</span>
+            <span class="stat-value">{{ stats.subject_count }}</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Semesters:</span>
+            <span class="stat-value">{{ stats.semesters_count }}</span>
+        </div>
+    </div>
+</div>
+
+<style>
+.config-container {
+    max-width: 600px;
+    margin: 0 auto 2rem;
+}
+
+.config-form {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.form-group small {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.shift-inputs {
+    margin-top: 1rem;
+}
+
+.info-box {
+    background: var(--bg-color);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid var(--info-color);
+}
+
+.btn-lg {
+    width: 100%;
+    font-size: 1.1rem;
+    padding: 1rem;
+}
+
+.stats-overview {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.stats-overview h2 {
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    font-weight: 600;
+}
+
+.stat-value {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+</style>
+
+<script>
+function toggleShiftInputs() {
+    const shiftMode = document.getElementById('shift_mode').value;
+    const singleInputs = document.getElementById('single-shift-inputs');
+    const multiInfo = document.getElementById('multi-shift-info');
+    
+    if (shiftMode === 'single') {
+        singleInputs.style.display = 'block';
+        multiInfo.style.display = 'none';
+    } else {
+        singleInputs.style.display = 'none';
+        multiInfo.style.display = 'block';
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', toggleShiftInputs);
+</script>
+{% endblock %}

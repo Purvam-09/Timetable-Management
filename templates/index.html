@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Timetable System{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <h1>🎓 Automatic Timetable Management System</h1>
+    <p class="subtitle">Generate conflict-free timetables for faculty and classes</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-number">{{ stats.faculty_count }}</div>
+        <div class="stat-label">Faculty Members</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">📚</div>
+        <div class="stat-number">{{ stats.subject_count }}</div>
+        <div class="stat-label">Subjects</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-number">{{ stats.semesters_count }}</div>
+        <div class="stat-label">Semesters</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">🔗</div>
+        <div class="stat-number">{{ stats.mappings_count }}</div>
+        <div class="stat-label">Mappings</div>
+    </div>
+</div>
+
+{% if config %}
+<div class="info-card">
+    <h2>📋 Active Configuration</h2>
+    <div class="config-info">
+        <p><strong>Academic Year:</strong> {{ config.academic_year }}</p>
+        <p><strong>Term:</strong> {{ config.term }}</p>
+        <p><strong>Semester:</strong> {{ config.semester }}</p>
+        <p><strong>Working Days:</strong> {{ config.working_days }}</p>
+        <p><strong>Shift Mode:</strong> {{ config.shift_mode }}</p>
+    </div>
+    <a href="{{ url_for('view_timetable') }}" class="btn btn-primary">View Timetable</a>
+</div>
+{% else %}
+<div class="info-card warning">
+    <h2>⚠️ No Active Configuration</h2>
+    <p>Please configure academic settings to generate timetables.</p>
+    <a href="{{ url_for('configure_page') }}" class="btn btn-primary">Configure Now</a>
+</div>
+{% endif %}
+
+<div class="workflow-section">
+    <h2>📝 How It Works</h2>
+    <div class="workflow-steps">
+        <div class="step">
+            <div class="step-number">1</div>
+            <h3>Upload Data</h3>
+            <p>Upload faculty and subject CSV files</p>
+        </div>
+        
+        <div class="step">
+            <div class="step-number">2</div>
+            <h3>Configure</h3>
+            <p>Set academic year, term, semester, and shifts</p>
+        </div>
+        
+        <div class="step">
+            <div class="step-number">3</div>
+            <h3>Generate</h3>
+            <p>Automatically generate conflict-free timetables</p>
+        </div>
+        
+        <div class="step">
+            <div class="step-number">4</div>
+            <h3>View & Export</h3>
+            <p>View class and faculty timetables</p>
+        </div>
+    </div>
+</div>
+
+<div class="quick-actions">
+    <h2>🚀 Quick Actions</h2>
+    <div class="action-buttons">
+        <a href="{{ url_for('upload_page') }}" class="btn btn-secondary">📤 Upload Data</a>
+        <a href="{{ url_for('configure_page') }}" class="btn btn-secondary">⚙️ Configure</a>
+        <a href="{{ url_for('generate_page') }}" class="btn btn-secondary">🔄 Generate</a>
+        <a href="{{ url_for('view_timetable') }}" class="btn btn-secondary">👁️ View Timetable</a>
+    </div>
+</div>
+{% endblock %}

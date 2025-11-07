@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Timetable{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>👥 Faculty Timetable</h1>
+    <p>Semester {{ config.semester }} - {{ config.term }} {{ config.academic_year }}</p>
+</div>
+
+<div class="view-switcher">
+    <a href="{{ url_for('view_timetable', type='class') }}" class="btn btn-secondary">Class View</a>
+    <a href="{{ url_for('view_timetable', type='faculty') }}" class="btn btn-primary">Faculty View</a>
+</div>
+
+{% if timetable %}
+    {% for faculty_id, data in timetable.items() %}
+    <div class="faculty-schedule">
+        <h2>👤 {{ data.faculty_name }} ({{ data.short_name }})</h2>
+        
+        {% if data.schedule %}
+            {% for day, slots in data.schedule.items() %}
+            <div class="day-section">
+                <h3>📅 {{ day }}</h3>
+                <table class="faculty-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Subject</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for slot in slots %}
+                        <tr>
+                            <td class="time-cell">{{ slot.start_time }} - {{ slot.end_time }}</td>
+                            <td>
+                                <strong>{{ slot.subject_code }}</strong><br>
+                                <small>{{ slot.subject_name }}</small>
+                            </td>
+                            <td>
+                                {% if slot.slot_type == 'lab' %}
+                                    <span class="lab-badge">🔬 LAB</span>
+                                {% else %}
+                                    <span class="lecture-badge">📚 LECTURE</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endfor %}
+            
+            <div class="workload-info">
+    {% set total_hours = 0 %}
+    {% for day, slots in data.schedule.items() %}
+        {% set total_hours = total_hours + slots|length %}
+    {% endfor %}
+    Total hours this week: <strong>{{ total_hours }}</strong>
+</div>
+        {% else %}
+            <p class="no-schedule">No classes scheduled for this faculty member.</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="no-data-message">
+        <h2>📋 No Faculty Assignments Yet</h2>
+        <p>Generate a timetable first to see faculty schedules.</p>
+        <a href="{{ url_for('generate_page') }}" class="btn btn-primary">Generate Timetable</a>
+    </div>
+{% endif %}
+
+<div class="action-buttons">
+    <button onclick="window.print()" class="btn btn-secondary">🖨️ Print Faculty Timetables</button>
+</div>
+
+<style>
+.view-switcher {
+    text-align: center;
+    margin: 2rem 0;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.faculty-schedule {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.faculty-schedule h2 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    border-bottom: 3px solid var(--primary-color);
+    padding-bottom: 0.5rem;
+}
+
+.day-section {
+    margin-bottom: 1.5rem;
+}
+
+.day-section h3 {
+    color: var(--secondary-color);
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.faculty-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.faculty-table th,
+.faculty-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.faculty-table th {
+    background: var(--bg-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.time-cell {
+    font-family: monospace;
+    font-weight: 600;
+    color: var(--text-secondary);
+    width: 150px;
+}
+
+.lab-badge {
+    background: #a78bfa;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.25rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.lecture-badge {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.25rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.workload-info {
+    text-align: right;
+    padding: 1rem;
+    background: var(--bg-color);
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+}
+
+.workload-info strong {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+.no-schedule {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.no-data-message {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--card-bg);
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+}
+
+.no-data-message h2 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.no-data-message p {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+}
+
+.action-buttons {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+/* Print styles */
+@media print {
+    .view-switcher, .action-buttons, .navbar, .footer {
+        display: none;
+    }
+    
+    .faculty-schedule {
+        page-break-after: always;
+        box-shadow: none;
+    }
+    
+    .faculty-schedule:last-child {
+        page-break-after: auto;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .faculty-table {
+        font-size: 0.9rem;
+    }
+    
+    .faculty-table th,
+    .faculty-table td {
+        padding: 0.5rem;
+    }
+    
+    .time-cell {
+        font-size: 0.85rem;
+    }
+}
+</style>
+{% endblock %}

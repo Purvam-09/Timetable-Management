@@ -1,0 +1,15 @@
+subject_name,code,semester,lecture_credits,lab_credits
+Data Structures,CS201,2,3,2
+Database Management Systems,CS202,2,3,2
+Operating Systems,CS301,3,4,2
+Computer Networks,CS302,3,3,2
+Software Engineering,CS401,4,3,2
+Web Technologies,CS402,4,2,4
+Artificial Intelligence,CS501,5,4,2
+Machine Learning,CS502,5,3,2
+Compiler Design,CS601,6,3,2
+Cloud Computing,CS602,6,2,2
+Big Data Analytics,CS701,7,3,2
+Cyber Security,CS702,7,3,2
+Internet of Things,CS801,8,2,4
+Blockchain Technology,CS802,8,3,2

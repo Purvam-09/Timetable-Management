@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Data - Timetable System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📤 Upload Data Files</h1>
+    <p>Upload CSV/Excel files containing faculty and subject information</p>
+</div>
+
+<div class="upload-grid">
+    <!-- Faculty Upload -->
+    <div class="upload-card">
+        <div class="card-icon">👥</div>
+        <h2>Faculty Data</h2>
+        <p class="card-description">Upload faculty information with availability</p>
+        
+        <div class="file-format-info">
+            <h3>Required Columns:</h3>
+            <ul>
+                <li><code>faculty_name</code> - Full name</li>
+                <li><code>short_name</code> - Abbreviation (e.g., RK)</li>
+                <li><code>specialization</code> - Subject area (optional)</li>
+                <li><code>availability</code> - Days (e.g., Mon-Tue-Wed-Thu-Fri)</li>
+                <li><code>max_hours_per_week</code> - Maximum hours (optional)</li>
+            </ul>
+        </div>
+        
+        <form action="{{ url_for('upload_faculty') }}" method="POST" enctype="multipart/form-data" class="upload-form">
+            <div class="file-input-wrapper">
+                <input type="file" name="file" id="faculty-file" accept=".csv,.xlsx,.xls" required>
+                <label for="faculty-file" class="file-input-label">
+                    <span class="file-icon">📁</span>
+                    <span class="file-text">Choose File</span>
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary">Upload Faculty Data</button>
+        </form>
+    </div>
+
+    <!-- Subject Upload -->
+    <div class="upload-card">
+        <div class="card-icon">📚</div>
+        <h2>Subject Data</h2>
+        <p class="card-description">Upload subject information with credit hours</p>
+        
+        <div class="file-format-info">
+            <h3>Required Columns:</h3>
+            <ul>
+                <li><code>subject_name</code> - Full subject name</li>
+                <li><code>code</code> - Subject code (e.g., CS201)</li>
+                <li><code>semester</code> - Semester number (1-8)</li>
+                <li><code>lecture_credits</code> - Lecture hours per week</li>
+                <li><code>lab_credits</code> - Lab hours per week</li>
+            </ul>
+        </div>
+        
+        <form action="{{ url_for('upload_subject') }}" method="POST" enctype="multipart/form-data" class="upload-form">
+            <div class="file-input-wrapper">
+                <input type="file" name="file" id="subject-file" accept=".csv,.xlsx,.xls" required>
+                <label for="subject-file" class="file-input-label">
+                    <span class="file-icon">📁</span>
+                    <span class="file-text">Choose File</span>
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary">Upload Subject Data</button>
+        </form>
+    </div>
+</div>
+
+<div class="info-card">
+    <h2>📋 Sample File Format</h2>
+    <p>Download sample CSV files to see the correct format:</p>
+    <div class="sample-buttons">
+        <a href="/static/samples/sample_faculty.csv" class="btn btn-secondary" download>📥 Sample Faculty CSV</a>
+        <a href="/static/samples/sample_subjects.csv" class="btn btn-secondary" download>📥 Sample Subject CSV</a>
+    </div>
+</div>
+
+<div class="tips-card">
+    <h2>💡 Upload Tips</h2>
+    <ul>
+        <li>Files must be in CSV or Excel format (.csv, .xlsx, .xls)</li>
+        <li>Column names must match exactly (case-sensitive)</li>
+        <li>Remove any extra whitespace from data</li>
+        <li>Use hyphens (-) instead of commas for availability days</li>
+        <li>Ensure no duplicate short_name or subject codes</li>
+        <li>Maximum file size: 16MB</li>
+    </ul>
+</div>
+{% endblock %}

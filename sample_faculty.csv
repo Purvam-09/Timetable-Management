@@ -1,0 +1,9 @@
+faculty_name,short_name,specialization,availability,max_hours_per_week
+Dr. Rajesh Kumar,RK,Computer Science,Mon-Tue-Wed-Thu-Fri,24
+Dr. Priya Sharma,PS,Data Science,Mon-Tue-Wed-Thu-Fri-Sat,26
+Prof. Amit Patel,AP,Software Engineering,Mon-Tue-Wed-Thu-Fri,20
+Dr. Sneha Desai,SD,Artificial Intelligence,Mon-Tue-Wed-Thu-Fri-Sat,24
+Prof. Vikram Singh,VS,Database Systems,Mon-Wed-Fri,18
+Dr. Anita Mehta,AM,Web Technologies,Mon-Tue-Wed-Thu-Fri,22
+Prof. Karan Shah,KS,Networking,Mon-Tue-Thu-Fri,20
+Dr. Meera Joshi,MJ,Computer Graphics,Tue-Wed-Thu-Fri-Sat,24

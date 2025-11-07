@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+
+{% block title %}Class Timetable{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📅 Class Timetable</h1>
+    <p>Semester {{ config.semester }} - {{ config.term }} {{ config.academic_year }}</p>
+</div>
+
+<div class="view-switcher">
+    <a href="{{ url_for('view_timetable', type='class') }}" class="btn btn-primary">Class View</a>
+    <a href="{{ url_for('view_timetable', type='faculty') }}" class="btn btn-secondary">Faculty View</a>
+</div>
+
+<div class="timetable-stats">
+    <div class="stat-box">
+        <span>Utilization:</span>
+        <strong>{{ "%.1f"|format(stats.utilization_percent) }}%</strong>
+    </div>
+    <div class="stat-box">
+        <span>Assigned Slots:</span>
+        <strong>{{ stats.assigned_slots }}/{{ stats.available_slots }}</strong>
+    </div>
+</div>
+
+{% if is_multi_shift %}
+    <!-- Multi-Shift Display -->
+    {% for shift in shifts %}
+    <div class="shift-container">
+        <div class="shift-header">
+            <h2>{{ shift.name }}</h2>
+            <p>⏰ {{ shift.start_time }} - {{ shift.end_time }}</p>
+        </div>
+        
+        <div class="timetable-grid-container">
+            <table class="timetable-grid">
+                <thead>
+                    <tr>
+                        <th class="time-header">Time</th>
+                        {% for day in days %}
+                        <th class="day-header">{{ day }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for slot in shift.time_slots %}
+                    <tr>
+                        <td class="time-cell">
+                            <div class="slot-number">{{ loop.index }}</div>
+                            <div class="time-range">
+                                {{ slot.start_time }}<br>{{ slot.end_time }}
+                            </div>
+                        </td>
+                        
+                        {% for day in days %}
+                            {% set cell = slot.days[day] %}
+                            
+                            {% if cell.is_break %}
+                                <td class="break-cell">
+                                    {% if loop.index == 3 %}
+                                        ☕ BREAK
+                                    {% else %}
+                                        🍽️ BREAK
+                                    {% endif %}
+                                </td>
+                            {% elif cell.subject_code %}
+                                <td class="subject-cell {% if cell.slot_type == 'lab' %}lab-cell{% endif %}">
+                                    <div class="subject-code">{{ cell.subject_code }}</div>
+                                    <div class="subject-name">{{ cell.subject_name }}</div>
+                                    <div class="faculty-name">{{ cell.faculty_short_name }}</div>
+                                    {% if cell.slot_type == 'lab' %}
+                                        <span class="lab-badge">🔬 LAB</span>
+                                    {% endif %}
+                                </td>
+                            {% else %}
+                                <td class="empty-cell">—</td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <!-- Single Shift Display -->
+    <div class="timetable-grid-container">
+        <table class="timetable-grid">
+            <thead>
+                <tr>
+                    <th class="time-header">Time</th>
+                    {% for day in days %}
+                    <th class="day-header">{{ day }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for slot in time_slots %}
+                <tr>
+                    <td class="time-cell">
+                        <div class="slot-number">{{ slot.slot_number }}</div>
+                        <div class="time-range">
+                            {{ slot.start_time }}<br>{{ slot.end_time }}
+                        </div>
+                    </td>
+                    
+                    {% for day in days %}
+                        {% set cell = slot.days[day] %}
+                        
+                        {% if cell.is_break %}
+                            <td class="break-cell">
+                                {% if slot.slot_number == 5 %}
+                                    🍽️ LUNCH
+                                {% else %}
+                                    ☕ BREAK
+                                {% endif %}
+                            </td>
+                        {% elif cell.subject_code %}
+                            <td class="subject-cell {% if cell.slot_type == 'lab' %}lab-cell{% endif %}">
+                                <div class="subject-code">{{ cell.subject_code }}</div>
+                                <div class="subject-name">{{ cell.subject_name }}</div>
+                                <div class="faculty-name">{{ cell.faculty_short_name }}</div>
+                                {% if cell.slot_type == 'lab' %}
+                                    <span class="lab-badge">🔬 LAB</span>
+                                {% endif %}
+                            </td>
+                        {% else %}
+                            <td class="empty-cell">—</td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+
+<div class="action-buttons">
+    <button onclick="window.print()" class="btn btn-secondary">🖨️ Print Timetable</button>
+</div>
+
+<style>
+.view-switcher {
+    text-align: center;
+    margin: 2rem 0;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.timetable-stats {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+.stat-box {
+    background: var(--card-bg);
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow);
+}
+
+.stat-box strong {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+}
+
+/* Multi-Shift Specific Styles */
+.shift-container {
+    margin-bottom: 3rem;
+}
+
+.shift-header {
+    text-align: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 1rem 1rem 0 0;
+    margin-bottom: 0;
+}
+
+.shift-header h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.8rem;
+}
+
+.shift-header p {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.shift-container .timetable-grid-container {
+    border-radius: 0 0 1rem 1rem;
+    margin-top: 0;
+}
+
+.timetable-grid-container {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+    margin-bottom: 2rem;
+}
+
+.timetable-grid {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+}
+
+.timetable-grid th {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 1rem;
+    font-weight: 600;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.time-header {
+    min-width: 100px;
+}
+
+.day-header {
+    min-width: 150px;
+}
+
+.timetable-grid td {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    text-align: center;
+    vertical-align: middle;
+}
+
+.time-cell {
+    background: #f7fafc;
+    font-weight: 600;
+    color: #4a5568;
+    text-align: center;
+}
+
+.slot-number {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.25rem;
+}
+
+.time-range {
+    font-size: 0.85rem;
+    font-family: monospace;
+    color: #64748b;
+    line-height: 1.3;
+}
+
+.subject-cell {
+    background: #fff;
+    padding: 0.5rem;
+}
+
+.subject-code {
+    font-weight: 700;
+    color: var(--primary-color);
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.subject-name {
+    font-size: 0.85rem;
+    color: #4a5568;
+    margin-bottom: 0.25rem;
+}
+
+.faculty-name {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.lab-cell {
+    background: #ede9fe !important;
+    border-left: 4px solid #a78bfa;
+}
+
+.lab-badge {
+    display: inline-block;
+    background: #a78bfa;
+    color: white;
+    padding: 0.15rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.7rem;
+    margin-top: 0.25rem;
+}
+
+.break-cell {
+    background: #fef3c7;
+    font-weight: 700;
+    color: #92400e;
+    font-size: 1rem;
+}
+
+.empty-cell {
+    background: #f9fafb;
+    color: #cbd5e0;
+    font-size: 1.2rem;
+}
+
+.action-buttons {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+/* Print styles */
+@media print {
+    .view-switcher, .timetable-stats, .action-buttons, .navbar, .footer {
+        display: none;
+    }
+    
+    .shift-container {
+        page-break-after: always;
+        margin-bottom: 2rem;
+    }
+    
+    .shift-container:last-child {
+        page-break-after: auto;
+    }
+    
+    .timetable-grid-container {
+        box-shadow: none;
+        padding: 0;
+    }
+    
+    .timetable-grid {
+        font-size: 0.8rem;
+    }
+    
+    .timetable-grid th,
+    .timetable-grid td {
+        padding: 0.4rem;
+    }
+    
+    .shift-header {
+        background: #667eea !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .timetable-grid-container {
+        padding: 0.5rem;
+    }
+    
+    .timetable-grid th,
+    .timetable-grid td {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .subject-name {
+        font-size: 0.75rem;
+    }
+    
+    .shift-header h2 {
+        font-size: 1.4rem;
+    }
+}
+</style>
+{% endblock %}

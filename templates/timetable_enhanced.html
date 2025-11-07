@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}Enhanced Timetable - {{ class_name }}{% endblock %}
+
+{% block content %}
+<style>
+.timetable-header {
+    text-align: center;
+    margin: 2rem 0;
+    padding: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 1rem;
+}
+
+.timetable-info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 2rem 0;
+    text-align: center;
+}
+
+.info-box {
+    background: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.timetable-grid {
+    overflow-x: auto;
+    margin: 2rem 0;
+}
+
+.tt-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.tt-table th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem;
+    font-weight: 600;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+}
+
+.tt-table td {
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    text-align: center;
+    vertical-align: middle;
+    min-width: 120px;
+}
+
+.time-slot {
+    font-weight: 600;
+    color: #4a5568;
+    background: #f7fafc;
+    font-family: monospace;
+    font-size: 0.85rem;
+}
+
+.subject-cell {
+    background: #fff;
+    min-height: 60px;
+}
+
+.subject-code {
+    font-weight: 700;
+    color: #2d3748;
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.faculty-code {
+    color: #4a5568;
+    font-weight: 600;
+    display: block;
+    font-size: 0.85rem;
+}
+
+.room-number {
+    color: #718096;
+    font-size: 0.75rem;
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.batch-label {
+    background: #edf2f7;
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.7rem;
+    color: #4a5568;
+    display: inline-block;
+    margin-top: 0.25rem;
+}
+
+.break-cell {
+    background: #fef3c7 !important;
+    font-weight: 600;
+    color: #92400e;
+}
+
+.lunch-break {
+    background: #fed7d7 !important;
+    font-weight: 600;
+    color: #742a2a;
+}
+
+.lab-cell {
+    background: #e0e7ff !important;
+    border-left: 4px solid #6366f1;
+}
+
+.online-cell {
+    background: #ccfbf1 !important;
+    border-left: 4px solid #14b8a6;
+}
+
+.empty-cell {
+    background: #f9fafb;
+    color: #cbd5e0;
+}
+
+.day-header {
+    background: #4c51bf !important;
+    color: white !important;
+}
+
+.print-btn {
+    background: #2563eb;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    margin: 1rem 0;
+}
+
+@media print {
+    .print-btn, nav, .footer { display: none; }
+    body { margin: 0; padding: 10px; }
+    .tt-table { page-break-inside: avoid; }
+}
+</style>
+
+<div class="timetable-header">
+    <h1>📅 {{ class_name }} - Timetable</h1>
+    <p>{{ config.term }} {{ config.academic_year }} | Semester {{ config.semester }}</p>
+    <button class="print-btn" onclick="window.print()">🖨️ Print Timetable</button>
+</div>
+
+<div class="timetable-info">
+    <div class="info-box">
+        <strong>Working Days</strong><br>
+        {{ config.working_days }}
+    </div>
+    <div class="info-box">
+        <strong>Total Subjects</strong><br>
+        {{ subjects|length }}
+    </div>
+    <div class="info-box">
+        <strong>Total Hours/Week</strong><br>
+        {{ total_hours }}
+    </div>
+</div>
+
+<div class="timetable-grid">
+    <table class="tt-table">
+        <thead>
+            <tr>
+                <th rowspan="2" class="time-slot">Time Slot</th>
+                <th colspan="6" style="background: #5a67d8;">Days of Week</th>
+            </tr>
+            <tr>
+                <th class="day-header">Monday</th>
+                <th class="day-header">Tuesday</th>
+                <th class="day-header">Wednesday</th>
+                <th class="day-header">Thursday</th>
+                <th class="day-header">Friday</th>
+                <th class="day-header">Saturday</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for slot_info in time_slots %}
+            <tr>
+                <td class="time-slot">
+                    <strong>{{ slot_info.slot_number }}</strong><br>
+                    {{ slot_info.start_time }}<br>{{ slot_info.end_time }}
+                </td>
+                
+                {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] %}
+                    {% set cell = slot_info.days.get(day) %}
+                    
+                    {% if cell %}
+                        {% if cell.is_break %}
+                            <td class="{% if 'Lunch' in cell.label %}lunch-break{% else %}break-cell{% endif %}">
+                                {{ cell.label }}
+                            </td>
+                        {% elif cell.subject_code %}
+                            <td class="subject-cell {% if cell.is_lab %}lab-cell{% elif cell.is_online %}online-cell{% endif %}">
+                                <span class="subject-code">{{ cell.subject_code }}</span>
+                                <span class="faculty-code">{{ cell.faculty_short_name }}</span>
+                                {% if cell.room_number and cell.room_number != 'Online' %}
+                                    <span class="room-number">📍 {{ cell.room_number }}</span>
+                                {% elif cell.is_online %}
+                                    <span class="room-number">🌐 Online</span>
+                                {% endif %}
+                                {% if cell.batch_label %}
+                                    <span class="batch-label">{{ cell.batch_label }}</span>
+                                {% endif %}
+                            </td>
+                        {% else %}
+                            <td class="empty-cell">—</td>
+                        {% endif %}
+                    {% else %}
+                        <td class="empty-cell">—</td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="legend" style="margin: 2rem 0; padding: 1.5rem; background: white; border-radius: 0.5rem;">
+    <h3>📋 Legend</h3>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1rem;">
+        <div><span style="display: inline-block; width: 20px; height: 20px; background: #e0e7ff; border: 1px solid #ccc;"></span> Lab Session</div>
+        <div><span style="display: inline-block; width: 20px; height: 20px; background: #ccfbf1; border: 1px solid #ccc;"></span> Online Class</div>
+        <div><span style="display: inline-block; width: 20px; height: 20px; background: #fef3c7; border: 1px solid #ccc;"></span> Short Break</div>
+        <div><span style="display: inline-block; width: 20px; height: 20px; background: #fed7d7; border: 1px solid #ccc;"></span> Lunch Break</div>
+    </div>
+</div>
+
+<div style="text-align: center; margin: 3rem 0; padding: 2rem; background: white; border-radius: 0.5rem;">
+    <h3>Faculty of Engineering & Technology</h3>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 2rem;">
+        <div>
+            <p>____________________</p>
+            <small>Sign of TimeTable Coordinator</small>
+        </div>
+        <div>
+            <p>____________________</p>
+            <small>Sign of HOD</small>
+        </div>
+        <div>
+            <p>____________________</p>
+            <small>Sign of Principal</small>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

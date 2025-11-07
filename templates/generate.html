@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Timetable - Timetable System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>🔄 Generate Timetable</h1>
+    <p>Automatically generate conflict-free timetables</p>
+</div>
+
+<div class="generate-info">
+    <h2>📋 Current Configuration</h2>
+    <div class="config-details">
+        <p><strong>Academic Year:</strong> {{ config.academic_year }}</p>
+        <p><strong>Term:</strong> {{ config.term }}</p>
+        <p><strong>Semester:</strong> {{ config.semester }}</p>
+        <p><strong>Working Days:</strong> {{ config.working_days }}</p>
+    </div>
+</div>
+
+<div class="subjects-info">
+    <h2>📚 Subjects for Semester {{ config.semester }}</h2>
+    {% if subjects %}
+        <table class="subjects-table">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Subject Name</th>
+                    <th>Lectures</th>
+                    <th>Labs</th>
+                    <th>Total Hours</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subject in subjects %}
+                <tr>
+                    <td><code>{{ subject.code }}</code></td>
+                    <td>{{ subject.subject_name }}</td>
+                    <td>{{ subject.lecture_credits }} hr</td>
+                    <td>{{ subject.lab_credits }} hr</td>
+                    <td><strong>{{ subject.lecture_credits + subject.lab_credits }} hr</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="no-data">
+            <p>⚠️ No subjects found for semester {{ config.semester }}</p>
+            <a href="{{ url_for('upload_page') }}" class="btn btn-secondary">Upload Subjects</a>
+        </div>
+    {% endif %}
+</div>
+
+{% if subjects %}
+<div class="generate-action">
+    <form action="{{ url_for('run_generation') }}" method="POST" onsubmit="return confirm('Generate timetable for {{ subjects|length }} subjects?');">
+        <button type="submit" class="btn btn-primary btn-lg">
+            🚀 Generate Timetable Now
+        </button>
+    </form>
+    <p class="note">This will create a conflict-free schedule for all subjects</p>
+</div>
+{% endif %}
+
+<style>
+.generate-info, .subjects-info, .generate-action {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.config-details p {
+    margin: 0.5rem 0;
+}
+
+.subjects-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.subjects-table th,
+.subjects-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.subjects-table th {
+    background: var(--bg-color);
+    font-weight: 600;
+}
+
+.subjects-table code {
+    background: #eff6ff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    color: var(--primary-color);
+}
+
+.generate-action {
+    text-align: center;
+}
+
+.generate-action .btn-lg {
+    font-size: 1.2rem;
+    padding: 1.25rem 2.5rem;
+}
+
+.note {
+    margin-top: 1rem;
+    color: var(--text-secondary);
+}
+
+.no-data {
+    text-align: center;
+    padding: 2rem;
+}
+</style>
+{% endblock %}
