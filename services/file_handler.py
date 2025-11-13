@@ -170,6 +170,77 @@ def validate_subject_file(df):
     
     return True, "Subject file is valid", warnings
 
+
+def validate_location_file(df):
+    """Validate location/classroom data file"""
+    required_columns = ['room_number']
+    optional_columns = ['building', 'floor', 'room_type', 'capacity']
+    
+    if df is None or df.empty:
+        return False, "File is empty or could not be read", []
+    
+    missing_columns = [col for col in required_columns if col not in df.columns]
+    if missing_columns:
+        return False, f"Missing required columns: {', '.join(missing_columns)}", []
+    
+    for col in required_columns:
+        if df[col].isnull().any():
+            return False, f"Column '{col}' contains empty values", []
+    
+    duplicates = df[df.duplicated(subset=['room_number'], keep=False)]
+    if not duplicates.empty:
+        dup_rooms = duplicates['room_number'].unique().tolist()
+        return False, f"Duplicate room_number found: {', '.join(map(str, dup_rooms))}", []
+    
+    if 'floor' in df.columns:
+        try:
+            df['floor'] = pd.to_numeric(df['floor'])
+        except:
+            return False, "Floor must be a valid number", []
+    
+    if 'capacity' in df.columns:
+        try:
+            df['capacity'] = pd.to_numeric(df['capacity'])
+            if (df['capacity'] < 0).any():
+                return False, "Capacity cannot be negative", []
+        except:
+            return False, "Capacity must be a valid number", []
+    
+    warnings = []
+    for col in optional_columns:
+        if col not in df.columns:
+            warnings.append(f"Optional column '{col}' not found - will use defaults")
+    
+    return True, "Location file is valid", warnings
+
+def process_location_file(filepath):
+    """Complete processing of location file"""
+    df = read_file(filepath)
+    
+    if df is None:
+        return False, "Could not read file", None, []
+    
+    is_valid, message, warnings = validate_location_file(df)
+    
+    if not is_valid:
+        return False, message, None, warnings
+    
+    if 'building' not in df.columns:
+        df['building'] = 'Main'
+    
+    if 'floor' not in df.columns:
+        df['floor'] = 0
+    
+    if 'room_type' not in df.columns:
+        df['room_type'] = 'Classroom'
+    
+    if 'capacity' not in df.columns:
+        df['capacity'] = 60
+    
+    preview = get_file_preview(df)
+    
+    return True, df, preview, warnings
+
 def get_file_preview(df, max_rows=10):
     """
     Get preview of DataFrame

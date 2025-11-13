@@ -1,26 +1,18 @@
 """
 Main Flask Application for Timetable Management System
+COMPLETE VERSION WITH LOCATION MANAGEMENT
 """
 
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 import os
 from werkzeug.utils import secure_filename
-# Update imports (around line 17-23)
-from services.timetable_service import (
-    get_class_timetable_grid,
-    get_class_timetable_multishift,
-    get_faculty_timetable,
-    get_faculty_timetable_grid,  # ADD THIS
-    get_faculty_timetable_multishift,  # ADD THIS
-    get_all_faculty_list,  # ADD THIS
-    get_timetable_statistics
-)
 
 # Import services
 from database.db_setup import initialize_database, get_table_info
 from services.file_handler import (
     process_faculty_file, 
     process_subject_file,
+    process_location_file,  # ADD THIS
     save_uploaded_file,
     UPLOAD_FOLDER
 )
@@ -39,7 +31,24 @@ from services.config_service import (
     get_time_slots
 )
 from services.scheduler import TimetableScheduler
-
+from services.timetable_service import (
+    get_class_timetable_grid,
+    get_class_timetable_multishift,
+    get_faculty_timetable,
+    get_faculty_timetable_grid,
+    get_faculty_timetable_multishift,
+    get_all_faculty_list,
+    get_timetable_statistics
+)
+# ADD THESE IMPORTS FOR LOCATION MANAGEMENT
+from services.location_service import (
+    insert_location_data,
+    get_all_locations,
+    get_location_statistics,
+    delete_location,
+    get_locations_by_type,
+    search_locations
+)
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -145,6 +154,97 @@ def upload_subject():
         flash(f'Error: {message}', 'error')
     
     return redirect(url_for('upload_page'))
+
+# ==================== LOCATION MANAGEMENT (NEW SECTION) ====================
+@app.route('/upload/location')
+def upload_location_page():
+    """Location upload page"""
+    return render_template('upload_location.html')
+
+@app.route('/upload/location', methods=['POST'])
+def upload_location():
+    """Handle location file upload"""
+    if 'file' not in request.files:
+        flash('No file selected', 'error')
+        return redirect(url_for('upload_location_page'))
+    
+    file = request.files['file']
+    
+    if file.filename == '':
+        flash('No file selected', 'error')
+        return redirect(url_for('upload_location_page'))
+    
+    # Save file
+    success, filepath = save_uploaded_file(file)
+    
+    if not success:
+        flash(filepath, 'error')
+        return redirect(url_for('upload_location_page'))
+    
+    # Process file
+    success, data, preview, warnings = process_location_file(filepath)
+    
+    if not success:
+        flash(f'Error: {data}', 'error')
+        return redirect(url_for('upload_location_page'))
+    
+    # Show warnings if any
+    for warning in warnings:
+        flash(warning, 'warning')
+    
+    # Insert into database
+    success, message, stats = insert_location_data(data)
+    
+    if success:
+        flash(f'Success! {message}', 'success')
+        return redirect(url_for('view_locations'))
+    else:
+        flash(f'Error: {message}', 'error')
+        return redirect(url_for('upload_location_page'))
+
+@app.route('/locations')
+def view_locations():
+    """View all locations page"""
+    locations = get_all_locations()
+    stats = get_location_statistics()
+    
+    return render_template('view_locations.html', 
+                         locations=locations, 
+                         stats=stats)
+
+@app.route('/api/location/<int:location_id>/delete', methods=['POST'])
+def delete_location_api(location_id):
+    """API endpoint to delete a location"""
+    success, message = delete_location(location_id)
+    return jsonify({'success': success, 'message': message})
+
+@app.route('/api/locations')
+def api_locations():
+    """API endpoint for all locations"""
+    locations = get_all_locations()
+    return jsonify(locations)
+
+@app.route('/api/locations/type/<room_type>')
+def api_locations_by_type(room_type):
+    """API endpoint for locations by type"""
+    locations = get_locations_by_type(room_type)
+    return jsonify(locations)
+
+@app.route('/api/locations/search')
+def api_locations_search():
+    """API endpoint to search locations"""
+    query = request.args.get('q', '')
+    if query:
+        locations = search_locations(query)
+    else:
+        locations = get_all_locations()
+    return jsonify(locations)
+
+@app.route('/api/locations/stats')
+def api_location_stats():
+    """API endpoint for location statistics"""
+    stats = get_location_statistics()
+    return jsonify(stats)
 
 # ==================== CONFIGURATION ====================
 @app.route('/configure')
@@ -346,6 +446,7 @@ def view_timetable():
                                  is_multi_shift=False,
                                  total_hours=timetable_data['total_hours'],
                                  all_faculty=all_faculty)
+
 # ==================== API ENDPOINTS ====================
 @app.route('/api/stats')
 def api_stats():

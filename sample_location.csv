@@ -1,0 +1,26 @@
+room_number,building,floor,room_type,capacity
+101,Main Building,1,Classroom,60
+102,Main Building,1,Classroom,60
+103,Main Building,1,Classroom,55
+104,Main Building,1,Classroom,65
+201,Main Building,2,Classroom,60
+202,Main Building,2,Classroom,60
+203,Main Building,2,Classroom,50
+LAB-A,Science Block,1,Lab,30
+LAB-B,Science Block,1,Lab,30
+LAB-C,Science Block,2,Lab,35
+LAB-D,Science Block,2,Lab,35
+COMP-LAB-1,IT Block,1,Lab,40
+COMP-LAB-2,IT Block,1,Lab,40
+COMP-LAB-3,IT Block,2,Lab,45
+LH-1,Main Building,0,Lecture Hall,120
+LH-2,Main Building,0,Lecture Hall,150
+LH-3,Admin Block,1,Lecture Hall,100
+SR-1,Admin Block,2,Seminar Room,40
+SR-2,Admin Block,2,Seminar Room,35
+SR-3,Admin Block,3,Seminar Room,30
+AUDIO-1,Media Block,1,Auditorium,200
+AUDIO-2,Media Block,2,Auditorium,150
+WORKSHOP-1,Engineering Block,0,Workshop,25
+WORKSHOP-2,Engineering Block,0,Workshop,25
+DRAWING-HALL,Engineering Block,1,Drawing Hall,80

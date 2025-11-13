@@ -9,13 +9,20 @@
 <body>
     <!-- Navigation -->
     <nav class="navbar">
-        <div class="container">
-            <div class="nav-brand">
-                <h1>📅 Timetable System</h1>
-            </div>
+    <div class="container">
+        <div class="nav-brand">
+            <h1>📅 Timetable System</h1>
+        </div>
             <ul class="nav-menu">
                 <li><a href="{{ url_for('index') }}" class="nav-link">Home</a></li>
-                <li><a href="{{ url_for('upload_page') }}" class="nav-link">Upload Data</a></li>
+                <li class="nav-dropdown">
+                    <a href="#" class="nav-link">Upload Data ▾</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ url_for('upload_page') }}">Faculty & Subjects</a></li>
+                        <li><a href="{{ url_for('upload_location_page') }}">Locations</a></li>
+                    </ul>
+                </li>
+                <li><a href="{{ url_for('view_locations') }}" class="nav-link">Locations</a></li>
                 <li><a href="{{ url_for('configure_page') }}" class="nav-link">Configure</a></li>
                 <li><a href="{{ url_for('generate_page') }}" class="nav-link">Generate</a></li>
                 <li><a href="{{ url_for('view_timetable') }}" class="nav-link">View Timetable</a></li>

@@ -76,6 +76,57 @@ body {
     opacity: 0.8;
 }
 
+.nav-dropdown {
+    position: relative;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    min-width: 200px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0;
+    list-style: none;
+    z-index: 1000;
+}
+
+.nav-dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown-menu li {
+    padding: 0;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 0.75rem 1.5rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.dropdown-menu a:hover {
+    background: var(--bg-color);
+}
+
+@media (max-width: 768px) {
+    .nav-dropdown:hover .dropdown-menu {
+        position: static;
+        box-shadow: none;
+        background: rgba(255,255,255,0.1);
+    }
+    
+    .dropdown-menu a {
+        color: white;
+        padding-left: 2rem;
+    }
+}
+
 /* ==================== FLASH MESSAGES ==================== */
 .flash-container {
     margin: 1rem 0;
