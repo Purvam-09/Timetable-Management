@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}View Locations{% endblock %}
+
+{% block content %}
+<h1>Locations</h1>
+
+<p>Total: {{ stats.total_locations }}</p>
+
+{% if locations %}
+<table border="1">
+    <tr>
+        <th>Room Number</th>
+        <th>Building</th>
+        <th>Floor</th>
+        <th>Type</th>
+        <th>Capacity</th>
+    </tr>
+    {% for location in locations %}
+    <tr>
+        <td>{{ location.room_number }}</td>
+        <td>{{ location.building }}</td>
+        <td>{{ location.floor }}</td>
+        <td>{{ location.room_type }}</td>
+        <td>{{ location.capacity }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No locations found. <a href="{{ url_for('upload_location_page') }}">Upload some</a></p>
+{% endif %}
+{% endblock %}

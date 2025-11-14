@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Locations - Timetable System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📍 Upload Location Data</h1>
+    <p>Upload CSV/Excel files containing classroom and lab information</p>
+</div>
+
+<div class="upload-container">
+    <!-- Location Upload Card -->
+    <div class="upload-card">
+        <div class="card-icon">🏢</div>
+        <h2>Location/Classroom Data</h2>
+        <p class="card-description">Upload information about classrooms, labs, and other facilities</p>
+        
+        <div class="file-format-info">
+            <h3>Required Columns:</h3>
+            <ul>
+                <li><code>room_number</code> - Room identifier (e.g., 101, LAB-A)</li>
+            </ul>
+            
+            <h3>Optional Columns:</h3>
+            <ul>
+                <li><code>building</code> - Building name (default: Main)</li>
+                <li><code>floor</code> - Floor number (default: 0)</li>
+                <li><code>room_type</code> - Type (Classroom/Lab/Lecture Hall, default: Classroom)</li>
+                <li><code>capacity</code> - Student capacity (default: 60)</li>
+            </ul>
+        </div>
+        
+        <form action="{{ url_for('upload_location') }}" method="POST" enctype="multipart/form-data" class="upload-form">
+            <div class="file-input-wrapper">
+                <input type="file" name="file" id="location-file" accept=".csv,.xlsx,.xls" required>
+                <label for="location-file" class="file-input-label">
+                    <span class="file-icon">📁</span>
+                    <span class="file-text">Choose File</span>
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary">📤 Upload Location Data</button>
+        </form>
+    </div>
+</div>
+
+<!-- Sample File Section -->
+<div class="info-card">
+    <h2>📋 Sample File Format</h2>
+    <p>Download a sample CSV file to see the correct format:</p>
+    <div class="sample-buttons">
+        <a href="/static/samples/sample_location.csv" class="btn btn-secondary" download>📥 Sample Location CSV</a>
+    </div>
+</div>
+
+<!-- Example Data Preview -->
+<div class="example-card">
+    <h2>📊 Example Data</h2>
+    <table class="example-table">
+        <thead>
+            <tr>
+                <th>room_number</th>
+                <th>building</th>
+                <th>floor</th>
+                <th>room_type</th>
+                <th>capacity</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>101</td>
+                <td>Main Building</td>
+                <td>1</td>
+                <td>Classroom</td>
+                <td>60</td>
+            </tr>
+            <tr>
+                <td>LAB-A</td>
+                <td>Science Block</td>
+                <td>1</td>
+                <td>Lab</td>
+                <td>30</td>
+            </tr>
+            <tr>
+                <td>LH-1</td>
+                <td>Main Building</td>
+                <td>0</td>
+                <td>Lecture Hall</td>
+                <td>120</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Tips Card -->
+<div class="tips-card">
+    <h2>💡 Upload Tips</h2>
+    <ul>
+        <li>Files must be in CSV or Excel format (.csv, .xlsx, .xls)</li>
+        <li><strong>room_number</strong> is the only required column</li>
+        <li>Room numbers must be unique (no duplicates)</li>
+        <li>Common room types: Classroom, Lab, Lecture Hall, Seminar Room, Workshop, Auditorium</li>
+        <li>Floor number: 0 = Ground floor, 1 = First floor, etc.</li>
+        <li>Capacity should be realistic based on room type</li>
+        <li>Remove any extra whitespace from data</li>
+        <li>Maximum file size: 16MB</li>
+    </ul>
+</div>
+
+<div class="quick-actions">
+    <a href="{{ url_for('view_locations') }}" class="btn btn-secondary">👁️ View All Locations</a>
+    <a href="{{ url_for('upload_page') }}" class="btn btn-secondary">📤 Upload Faculty/Subjects</a>
+</div>
+
+<style>
+.upload-container {
+    max-width: 800px;
+    margin: 0 auto 2rem;
+}
+
+.upload-card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.card-icon {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.upload-card h2 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.card-description {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.file-format-info {
+    background: var(--bg-color);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.file-format-info h3 {
+    font-size: 0.95rem;
+    margin-bottom: 0.75rem;
+    color: var(--primary-color);
+}
+
+.file-format-info ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 1rem;
+}
+
+.file-format-info ul:last-child {
+    margin-bottom: 0;
+}
+
+.file-format-info li {
+    padding: 0.4rem 0;
+    font-size: 0.9rem;
+}
+
+.file-format-info code {
+    background: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.25rem;
+    font-family: monospace;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.file-input-wrapper {
+    position: relative;
+}
+
+.file-input-wrapper input[type="file"] {
+    display: none;
+}
+
+.file-input-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    background: var(--bg-color);
+    border: 2px dashed var(--border-color);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.file-input-label:hover {
+    border-color: var(--primary-color);
+    background: #eff6ff;
+}
+
+.file-icon {
+    font-size: 2rem;
+}
+
+.file-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.example-card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.example-card h2 {
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.example-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.example-table th,
+.example-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.example-table th {
+    background: var(--bg-color);
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.example-table tbody tr:hover {
+    background: var(--bg-color);
+}
+
+.info-card {
+    background: #dbeafe;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border-left: 4px solid var(--info-color);
+    margin-bottom: 2rem;
+}
+
+.info-card h2 {
+    color: var(--info-color);
+    margin-bottom: 1rem;
+}
+
+.sample-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.tips-card {
+    background: #fffbeb;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border-left: 4px solid var(--warning-color);
+    margin-bottom: 2rem;
+}
+
+.tips-card h2 {
+    color: var(--warning-color);
+    margin-bottom: 1rem;
+}
+
+.tips-card ul {
+    list-style-position: inside;
+}
+
+.tips-card li {
+    margin: 0.5rem 0;
+}
+
+.quick-actions {
+    text-align: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .upload-container {
+        padding: 0 1rem;
+    }
+    
+    .example-table {
+        font-size: 0.85rem;
+    }
+    
+    .example-table th,
+    .example-table td {
+        padding: 0.5rem;
+    }
+}
+</style>
+
+<script>
+// Update file input label with selected filename
+document.getElementById('location-file').addEventListener('change', function(e) {
+    const fileName = e.target.files[0]?.name;
+    if (fileName) {
+        const label = document.querySelector('.file-text');
+        label.textContent = fileName;
+    }
+});
+</script>
+{% endblock %}
