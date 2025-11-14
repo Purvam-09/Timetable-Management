@@ -5,28 +5,26 @@
 {% block content %}
 <div class="page-header">
     <h1>📍 Upload Location Data</h1>
-    <p>Upload CSV/Excel files containing classroom and lab information</p>
+    <p>Upload classroom and lab location information</p>
 </div>
 
-<div class="upload-container">
-    <!-- Location Upload Card -->
+<div class="upload-section">
     <div class="upload-card">
         <div class="card-icon">🏢</div>
-        <h2>Location/Classroom Data</h2>
-        <p class="card-description">Upload information about classrooms, labs, and other facilities</p>
+        <h2>Location/Room Data</h2>
+        <p class="card-description">Upload information about classrooms, labs, and other teaching spaces</p>
         
         <div class="file-format-info">
             <h3>Required Columns:</h3>
             <ul>
-                <li><code>room_number</code> - Room identifier (e.g., 101, LAB-A)</li>
+                <li><code>room_number</code> - Unique room identifier (e.g., 101, LAB-A)</li>
             </ul>
-            
             <h3>Optional Columns:</h3>
             <ul>
-                <li><code>building</code> - Building name (default: Main)</li>
+                <li><code>building</code> - Building name (default: "Main")</li>
                 <li><code>floor</code> - Floor number (default: 0)</li>
-                <li><code>room_type</code> - Type (Classroom/Lab/Lecture Hall, default: Classroom)</li>
-                <li><code>capacity</code> - Student capacity (default: 60)</li>
+                <li><code>room_type</code> - Type: Classroom, Lab, Lecture Hall, etc. (default: "Classroom")</li>
+                <li><code>capacity</code> - Maximum students (default: 60)</li>
             </ul>
         </div>
         
@@ -37,82 +35,94 @@
                     <span class="file-icon">📁</span>
                     <span class="file-text">Choose File</span>
                 </label>
+                <small class="file-name-display"></small>
             </div>
-            <button type="submit" class="btn btn-primary">📤 Upload Location Data</button>
+            <button type="submit" class="btn btn-primary">Upload Location Data</button>
         </form>
     </div>
 </div>
 
-<!-- Sample File Section -->
 <div class="info-card">
     <h2>📋 Sample File Format</h2>
     <p>Download a sample CSV file to see the correct format:</p>
-    <div class="sample-buttons">
-        <a href="/static/samples/sample_location.csv" class="btn btn-secondary" download>📥 Sample Location CSV</a>
+    <a href="/static/samples/sample_location.csv" class="btn btn-secondary" download>📥 Download Sample Location CSV</a>
+    
+    <div class="sample-preview">
+        <h3>Sample Data:</h3>
+        <table class="preview-table">
+            <thead>
+                <tr>
+                    <th>room_number</th>
+                    <th>building</th>
+                    <th>floor</th>
+                    <th>room_type</th>
+                    <th>capacity</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>101</td>
+                    <td>Main Building</td>
+                    <td>1</td>
+                    <td>Classroom</td>
+                    <td>60</td>
+                </tr>
+                <tr>
+                    <td>LAB-A</td>
+                    <td>Science Block</td>
+                    <td>1</td>
+                    <td>Lab</td>
+                    <td>30</td>
+                </tr>
+                <tr>
+                    <td>LH-1</td>
+                    <td>Main Building</td>
+                    <td>0</td>
+                    <td>Lecture Hall</td>
+                    <td>120</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
-<!-- Example Data Preview -->
-<div class="example-card">
-    <h2>📊 Example Data</h2>
-    <table class="example-table">
-        <thead>
-            <tr>
-                <th>room_number</th>
-                <th>building</th>
-                <th>floor</th>
-                <th>room_type</th>
-                <th>capacity</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>101</td>
-                <td>Main Building</td>
-                <td>1</td>
-                <td>Classroom</td>
-                <td>60</td>
-            </tr>
-            <tr>
-                <td>LAB-A</td>
-                <td>Science Block</td>
-                <td>1</td>
-                <td>Lab</td>
-                <td>30</td>
-            </tr>
-            <tr>
-                <td>LH-1</td>
-                <td>Main Building</td>
-                <td>0</td>
-                <td>Lecture Hall</td>
-                <td>120</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-<!-- Tips Card -->
 <div class="tips-card">
-    <h2>💡 Upload Tips</h2>
+    <h2>💡 Location Upload Tips</h2>
     <ul>
-        <li>Files must be in CSV or Excel format (.csv, .xlsx, .xls)</li>
-        <li><strong>room_number</strong> is the only required column</li>
-        <li>Room numbers must be unique (no duplicates)</li>
-        <li>Common room types: Classroom, Lab, Lecture Hall, Seminar Room, Workshop, Auditorium</li>
-        <li>Floor number: 0 = Ground floor, 1 = First floor, etc.</li>
-        <li>Capacity should be realistic based on room type</li>
-        <li>Remove any extra whitespace from data</li>
-        <li>Maximum file size: 16MB</li>
+        <li><strong>Unique Identifiers:</strong> Each room_number must be unique</li>
+        <li><strong>Room Types:</strong> Use consistent naming (Classroom, Lab, Lecture Hall, Seminar Room, etc.)</li>
+        <li><strong>Capacity:</strong> Enter realistic capacity numbers for proper room assignment</li>
+        <li><strong>Building Names:</strong> Use consistent building names for better organization</li>
+        <li><strong>Floor Numbers:</strong> Ground floor = 0, First floor = 1, etc.</li>
+        <li><strong>Labs:</strong> Mark labs appropriately so they can be assigned to lab sessions</li>
+        <li><strong>Updates:</strong> Re-uploading will update existing rooms with same room_number</li>
     </ul>
 </div>
 
-<div class="quick-actions">
-    <a href="{{ url_for('view_locations') }}" class="btn btn-secondary">👁️ View All Locations</a>
-    <a href="{{ url_for('upload_page') }}" class="btn btn-secondary">📤 Upload Faculty/Subjects</a>
+<div class="quick-stats">
+    <h2>📊 Current Location Data</h2>
+    <div class="stats-row">
+        <div class="stat-box">
+            <span class="stat-icon">🏢</span>
+            <span class="stat-number">{{ stats.total_locations if stats else 0 }}</span>
+            <span class="stat-label">Total Locations</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-icon">🎓</span>
+            <span class="stat-number">{{ stats.classrooms if stats else 0 }}</span>
+            <span class="stat-label">Classrooms</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-icon">🔬</span>
+            <span class="stat-number">{{ stats.labs if stats else 0 }}</span>
+            <span class="stat-label">Labs</span>
+        </div>
+    </div>
+    <a href="{{ url_for('view_locations') }}" class="btn btn-secondary">View All Locations</a>
 </div>
 
 <style>
-.upload-container {
+.upload-section {
     max-width: 800px;
     margin: 0 auto 2rem;
 }
@@ -122,48 +132,30 @@
     padding: 2rem;
     border-radius: 1rem;
     box-shadow: var(--shadow);
-    margin-bottom: 2rem;
 }
 
 .card-icon {
-    font-size: 3rem;
+    font-size: 4rem;
     text-align: center;
     margin-bottom: 1rem;
-}
-
-.upload-card h2 {
-    color: var(--primary-color);
-    margin-bottom: 0.5rem;
-    text-align: center;
-}
-
-.card-description {
-    color: var(--text-secondary);
-    margin-bottom: 1.5rem;
-    text-align: center;
 }
 
 .file-format-info {
     background: var(--bg-color);
     padding: 1.5rem;
     border-radius: 0.5rem;
-    margin-bottom: 1.5rem;
+    margin: 1.5rem 0;
 }
 
 .file-format-info h3 {
     font-size: 0.95rem;
-    margin-bottom: 0.75rem;
+    margin: 1rem 0 0.5rem 0;
     color: var(--primary-color);
 }
 
 .file-format-info ul {
     list-style: none;
-    padding-left: 0;
-    margin-bottom: 1rem;
-}
-
-.file-format-info ul:last-child {
-    margin-bottom: 0;
+    padding: 0;
 }
 
 .file-format-info li {
@@ -175,19 +167,17 @@
     background: white;
     padding: 0.2rem 0.5rem;
     border-radius: 0.25rem;
-    font-family: monospace;
+    font-family: 'Courier New', monospace;
     color: var(--primary-color);
     font-weight: 600;
 }
 
 .upload-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    margin-top: 1.5rem;
 }
 
 .file-input-wrapper {
-    position: relative;
+    margin-bottom: 1rem;
 }
 
 .file-input-wrapper input[type="file"] {
@@ -201,10 +191,11 @@
     gap: 0.75rem;
     padding: 1.5rem;
     background: var(--bg-color);
-    border: 2px dashed var(--border-color);
-    border-radius: 0.5rem;
+    border: 3px dashed var(--border-color);
+    border-radius: 0.75rem;
     cursor: pointer;
     transition: all 0.3s;
+    font-weight: 600;
 }
 
 .file-input-label:hover {
@@ -216,118 +207,117 @@
     font-size: 2rem;
 }
 
-.file-text {
-    font-size: 1.1rem;
-    font-weight: 600;
+.file-name-display {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--text-secondary);
+    font-style: italic;
 }
 
-.example-card {
-    background: var(--card-bg);
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: var(--shadow);
-    margin-bottom: 2rem;
+.sample-preview {
+    margin-top: 1.5rem;
 }
 
-.example-card h2 {
-    margin-bottom: 1rem;
-    color: var(--primary-color);
-}
-
-.example-table {
+.preview-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
+    font-size: 0.9rem;
 }
 
-.example-table th,
-.example-table td {
+.preview-table th,
+.preview-table td {
     padding: 0.75rem;
     text-align: left;
-    border-bottom: 1px solid var(--border-color);
+    border: 1px solid var(--border-color);
 }
 
-.example-table th {
+.preview-table th {
     background: var(--bg-color);
     font-weight: 600;
     color: var(--primary-color);
 }
 
-.example-table tbody tr:hover {
-    background: var(--bg-color);
+.preview-table tbody tr:hover {
+    background: #f8fafc;
 }
 
-.info-card {
-    background: #dbeafe;
-    padding: 1.5rem;
+.quick-stats {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
     border-radius: 1rem;
-    border-left: 4px solid var(--info-color);
-    margin-bottom: 2rem;
-}
-
-.info-card h2 {
-    color: var(--info-color);
-    margin-bottom: 1rem;
-}
-
-.sample-buttons {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.tips-card {
-    background: #fffbeb;
-    padding: 1.5rem;
-    border-radius: 1rem;
-    border-left: 4px solid var(--warning-color);
-    margin-bottom: 2rem;
-}
-
-.tips-card h2 {
-    color: var(--warning-color);
-    margin-bottom: 1rem;
-}
-
-.tips-card ul {
-    list-style-position: inside;
-}
-
-.tips-card li {
-    margin: 0.5rem 0;
-}
-
-.quick-actions {
     text-align: center;
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
+}
+
+.quick-stats h2 {
+    margin-bottom: 1.5rem;
+}
+
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.stat-box {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    backdrop-filter: blur(10px);
+}
+
+.stat-box .stat-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.stat-box .stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.stat-box .stat-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.quick-stats .btn {
+    margin-top: 1rem;
+    background: white;
+    color: var(--primary-color);
+}
+
+.quick-stats .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
 @media (max-width: 768px) {
-    .upload-container {
+    .upload-section {
         padding: 0 1rem;
     }
     
-    .example-table {
-        font-size: 0.85rem;
-    }
-    
-    .example-table th,
-    .example-table td {
-        padding: 0.5rem;
+    .stats-row {
+        grid-template-columns: 1fr;
     }
 }
 </style>
 
 <script>
-// Update file input label with selected filename
+// Display selected filename
 document.getElementById('location-file').addEventListener('change', function(e) {
     const fileName = e.target.files[0]?.name;
+    const display = document.querySelector('.file-name-display');
+    const textSpan = document.querySelector('.file-text');
+    
     if (fileName) {
-        const label = document.querySelector('.file-text');
-        label.textContent = fileName;
+        textSpan.textContent = fileName;
+        display.textContent = `Selected: ${fileName}`;
     }
 });
 </script>
